@@ -137,6 +137,46 @@ def test_add_friend():
 
 ## PATCH TESTS ##
 
+def test_update_list():
+    update = {
+        "listname": "test_list",
+        "public": True
+    }
+
+    resp = requests.patch('https://todoloo307.herokuapp.com/testMcTesterson/lists', json=update)
+    if (resp):
+        r = resp.json()
+        assert ((r['public'] == True) and (resp.status_code == 200))
+    else:
+        pytest.fail("Request failed: ", resp.status_code)
+
+def test_complete_task():
+    update = {
+        "task_num": 0,
+        "completed": True
+    }
+
+    resp = requests.patch('https://todoloo307.herokuapp.com/testMcTesterson/lists/test_list', json=update)
+    if (resp):
+        r = resp.json()
+        assert ((r['completed'] == True) and (resp.status_code == 200))
+    else:
+        pytest.fail("Request failed: ", resp.status_code)
+
+
+def test_complete_list():
+    update = {
+        "listname": "test_list",
+        "completed": True
+    }
+
+    resp = requests.patch('https://todoloo307.herokuapp.com/testMcTesterson/lists', json=update)
+    if (resp):
+        r = resp.json()
+        assert ((r['completed'] == True) and (resp.status_code == 200))
+    else:
+        pytest.fail("Request failed: ", resp.status_code)
+
 
 ## DELETE TESTS ##
 
@@ -148,11 +188,21 @@ def test_delete_task():
     resp = requests.delete('https://todoloo307.herokuapp.com/testMcTesterson/lists/test_list', json=task)
     if (resp):
         r = resp.json()
-        assert ((r['task_deleted'] == 0) and (resp.status_code == 204))
+        assert ((r['task_deleted'] == 0) and (resp.status_code == 200))
     else:
         pytest.fail("Request failed: ", resp.status_code)
 
-#def test_delete_list():
+def test_delete_list():
+    lst = {
+        "listname": "test_list"
+    }
+
+    resp = requests.delete('https://todoloo307.herokuapp.com/testMcTesterson/lists', json=lst)
+    if (resp):
+        r = resp.json()
+        assert ((r['name'] == "test_list") and (resp.status_code == 200))
+    else:
+        pytest.fail("Request failed: ", resp.status_code)
 
 ## HELPER TESTS ##
 
@@ -190,6 +240,4 @@ def test_ret_task():
 
 ## TEARDOWN ##
 
-# @pytest.fixture(scope="session", autouse=True)
-# def cleanup():
-# remove testMcTesterson
+# "testMcTesterson" must be deleted from database at end of tests
