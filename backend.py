@@ -7,10 +7,10 @@ from flask_cors import CORS
 from mongodb import User
 
 
-backend = Flask(__name__)
-CORS(backend)
+app = Flask(__name__)
+CORS(app)
 
-@backend.route('/<username>/home')
+@app.route('/<username>/home')
 def get_home(username):
     user = User().find_by_username(username)
     if user is None:
@@ -20,7 +20,7 @@ def get_home(username):
     return jsonify(user), 200
 
 
-@backend.route('/<username>/lists/<listname>', methods=['GET', 'POST', 'DELETE', 'PATCH'])
+@app.route('/<username>/lists/<listname>', methods=['GET', 'POST', 'DELETE', 'PATCH'])
 def get_task(username, listname):
     if request.method == 'GET':
         user = User().find_by_username(username)
@@ -73,7 +73,7 @@ def get_task(username, listname):
         return jsonify(lists), 200
 
 
-@backend.route('/<username>/lists', methods=['GET', 'POST', 'PATCH', 'DELETE'])
+@app.route('/<username>/lists', methods=['GET', 'POST', 'PATCH', 'DELETE'])
 def get_lists(username):
     user = User().find_by_username(username)
     if user is None:
@@ -142,7 +142,7 @@ def get_lists(username):
         return jsonify(lists), 200
 
 
-@backend.route('/<username>/friends',  methods=['GET', 'POST'])
+@app.route('/<username>/friends',  methods=['GET', 'POST'])
 def get_friends(username):
     if request.method == 'GET':
         friendList = []
@@ -166,7 +166,7 @@ def get_friends(username):
         return jsonify({'friend': ret}), 200
 
 
-@backend.route('/', methods=['GET', 'POST'])
+@app.route('/', methods=['GET', 'POST'])
 def helloWorld():
     if request.method == 'GET':
         return jsonify('Hello, World!'), 200
@@ -191,7 +191,7 @@ def helloWorld():
         return jsonify({"username": username}), 200
         
 
-@backend.route('/api/users', methods=['POST'])
+@app.route('/api/users', methods=['POST'])
 def create_user():
     if request.method == 'POST':
         ret = request.get_json()
@@ -217,7 +217,7 @@ def create_user():
         return resp
 
 
-@backend.route('/admin', methods=['GET'])
+@app.route('/admin', methods=['GET'])
 def admin_stats():
     if request.method == 'GET':
         resp = User().find_all()
@@ -231,4 +231,4 @@ def admin_stats():
 
 
 if __name__ == "__main__":
-  backend.run()
+  app.run()
