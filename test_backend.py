@@ -27,6 +27,12 @@ def test_get_home():
     else:
         pytest.fail("Request failed: ", resp.status_code)
 
+def test_get_home_fail():
+    resp = requests.get('https://todoloo307server.herokuapp.com/{0}/home'.format("tim"))
+    if (resp.status_code):
+        assert (resp.status_code == 400)
+    else:
+        pytest.fail("Request failed: ", resp.status_code)
 
 def test_get_lists():
     resp = requests.get('https://todoloo307server.herokuapp.com/{0}/lists'.format('hreese'))
@@ -36,21 +42,48 @@ def test_get_lists():
     else:
         pytest.fail("Request failed: ", resp.status_code)
 
+def test_get_lists_fail():
+    resp = requests.get('https://todoloo307server.herokuapp.com/{0}/lists'.format('asdf'))
+    if (resp.status_code):
+        assert (resp.status_code == 400)
+    else:
+        pytest.fail("Request failed: ", resp.status_code)
+
 
 def test_get_friends():
     resp = requests.get('https://todoloo307server.herokuapp.com/{0}/friends'.format('hreese'))
     if (resp):
         r = resp.json()
-        assert (r[0]['username'] == 'bob24')
+        assert (r[0][0]['username'] == 'bob24')
     else:
         pytest.fail("Request failed: ", resp.status_code)
 
+def test_get_friends_fail():
+    resp = requests.get('https://todoloo307server.herokuapp.com/{0}/friends'.format('askjdf'))
+    if (resp.status_code):
+        assert (resp.status_code == 400)
+    else:
+        pytest.fail("Request failed: ", resp.status_code)
 
 def test_get_task():
     resp = requests.get('https://todoloo307server.herokuapp.com/{0}/lists/{1}'.format('hreese', 'School'))
     if (resp):
         r = resp.json()
         assert (r[0]['title'] == 'Math Homework')
+    else:
+        pytest.fail("Request failed: ", resp.status_code)
+
+def test_get_task_fail1():
+    resp = requests.get('https://todoloo307server.herokuapp.com/{0}/lists/{1}'.format("asdfa", 'School'))
+    if (resp.status_code):
+        assert (resp.status_code == 400)
+    else:
+        pytest.fail("Request failed: ", resp.status_code)
+
+def test_get_task_fail2():
+    resp = requests.get('https://todoloo307server.herokuapp.com/{0}/lists/{1}'.format('hreese', 'asdgasdg'))
+    if (resp.status_code):
+        assert (resp.status_code == 400)
     else:
         pytest.fail("Request failed: ", resp.status_code)
 
@@ -61,7 +94,7 @@ def test_get_admin_stats():
         r = resp.json()
         assert (len(r) != 0)
     else:
-        pytest.fail("Request failed")       
+        pytest.fail("Request failed")
 
 ## POST TESTS ##
 
@@ -79,11 +112,35 @@ def test_create_user():
     else:
         pytest.fail("Request failed: ", resp.status_code)
 
+def test_create_user_fail1():
+    user = {
+        "password": "test123",
+        "name": "Test"
+    }
 
-def test_login(): 
+    resp = requests.post('https://todoloo307server.herokuapp.com/api/users', json=user)
+    if (resp.status_code):
+        assert (resp.status_code == 418)
+    else:
+        pytest.fail("Request failed: ", resp.status_code)
+
+def test_create_user_fail2():
+    user = {
+        "username": "",
+        "password": "test123",
+        "name": "Test"
+    }
+
+    resp = requests.post('https://todoloo307server.herokuapp.com/api/users', json=user)
+    if (resp.status_code):
+        assert (resp.status_code == 418)
+    else:
+        pytest.fail("Request failed: ", resp.status_code)
+
+def test_login():
     user = {
         "username": "testMcTesterson",
-        "password": "test123",
+        "password": "test123"
     }
 
     resp = requests.post('https://todoloo307server.herokuapp.com/', json=user)
@@ -93,6 +150,29 @@ def test_login():
     else:
         pytest.fail("Request failed: ", resp.status_code)
 
+def test_login_fail1():
+    user = {
+        "username": "testMcTesterson",
+        "password": ""
+    }
+
+    resp = requests.post('https://todoloo307server.herokuapp.com/', json=user)
+    if (resp.status_code):
+        assert (resp.status_code == 400)
+    else:
+        pytest.fail("Request failed: ", resp.status_code)
+
+def test_login_fail2():
+    user = {
+        "username": "testMcTesterson",
+        "password": "test"
+    }
+
+    resp = requests.post('https://todoloo307server.herokuapp.com/', json=user)
+    if (resp.status_code):
+        assert (resp.status_code == 400)
+    else:
+        pytest.fail("Request failed: ", resp.status_code)
 
 def test_add_list():
     new_list = {
@@ -106,6 +186,30 @@ def test_add_list():
     else:
         pytest.fail("Request failed: ", resp.status_code)
 
+def test_add_list_public():
+    new_list = {
+        "listname": "temp",
+        "public": False
+    }
+
+    resp = requests.post('https://todoloo307server.herokuapp.com/testMcTesterson/lists', json=new_list)
+    if (resp):
+        r = resp.json()
+        assert ((r[-1]['name'] == 'test_list'))
+    else:
+        pytest.fail("Request failed: ", resp.status_code)
+
+def test_add_list_fail():
+    new_list = {
+        "timmy": "test_list"
+    }
+
+    resp = requests.post('https://todoloo307server.herokuapp.com/testMcTesterson/lists', json=new_list)
+    if (resp.status_code):
+        assert (resp.status_code == 400)
+    else:
+        pytest.fail("Request failed: ", resp.status_code)
+
 
 def test_add_task():
     task = {
@@ -114,7 +218,7 @@ def test_add_task():
         "description": "N/A",
         "priority": 3
     }
-   
+
     resp = requests.post('https://todoloo307server.herokuapp.com/testMcTesterson/lists/test_list', json=task)
     if (resp):
         r = resp.json()
@@ -131,7 +235,7 @@ def test_add_friend():
     resp = requests.post('https://todoloo307server.herokuapp.com/testMcTesterson/friends', json=friend)
     if (resp):
         r = resp.json()
-        assert ((r[-1]['username'] == 'hreese') and (resp.status_code == 200))
+        assert ((r[0][-1]['username'] == 'hreese') and (resp.status_code == 200))
     else:
         pytest.fail("Request failed: ", resp.status_code)
 
@@ -147,7 +251,7 @@ def test_update_list():
     resp = requests.patch('https://todoloo307server.herokuapp.com/testMcTesterson/lists', json=update)
     if (resp):
         r = resp.json()
-        assert ((r['public'] == True) and (resp.status_code == 200))
+        assert ((r[0]['public'] == True) and (resp.status_code == 200))
     else:
         pytest.fail("Request failed: ", resp.status_code)
 
@@ -174,7 +278,7 @@ def test_complete_list():
     resp = requests.patch('https://todoloo307server.herokuapp.com/testMcTesterson/lists', json=update)
     if (resp):
         r = resp.json()
-        assert ((r['completed'] == True) and (resp.status_code == 200))
+        assert ((r[0]['completed'] == True) and (resp.status_code == 200))
     else:
         pytest.fail("Request failed: ", resp.status_code)
 
