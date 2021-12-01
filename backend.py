@@ -163,7 +163,13 @@ def get_friends(username):
         except:
             return jsonify({}), 400
         ret = User().add_friend(username, fUsername)
-        return jsonify({'friend': ret}), 200
+        user = User().find_by_username(username)
+        lists = user[0]["friends"]
+        friendList = []
+        for i in lists:
+            fren = User().find_by_username(i)
+            friendList.append(fren)
+        return jsonify(friendList), 200
 
 
 @app.route('/', methods=['GET', 'POST'])
