@@ -1,4 +1,4 @@
-from backend import ret_list, ret_task
+from backend import ret_list
 import pytest
 from flask.globals import request
 
@@ -225,22 +225,6 @@ def test_ret_list():
     ret = ret_list(username, listname)
     assert(ret['name'] == expected['name'])
 
-
-def test_ret_task():
-    username = 'hreese'
-    listname = 'School'
-
-    expected = {
-        "completed": True,
-        "date": "10-22-2021",
-        "description": "Problems 1-30",
-        "priority": 3,
-        "title": "Math Homework"
-    }
-
-    ret = ret_task(username, listname, 0)
-
-    assert(ret['title'] == expected['title'])
 
 ## TEARDOWN ##
 
