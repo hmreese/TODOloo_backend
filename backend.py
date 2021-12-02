@@ -133,7 +133,7 @@ def get_lists(username):
             listname = request.get_json()['listname']
         except:
             return jsonify({}), 400
-        if username is None or listname is None:
+        if username is None or len(listname) == 0:
             return jsonify({}), 400
 
         ret = User().remove_list(username, listname)
